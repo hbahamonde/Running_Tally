@@ -39,6 +39,10 @@ h3 { /* Header 3 */
  font-size: 18px;
  color: DarkBlue;
 }
+h4 { /* Header 4 */
+ font-size: 14px;
+ color: DarkBlue;
+}
 code.r{ /* Code block */
   font-size: 10px;
 }
@@ -1342,7 +1346,7 @@ ggplot() +
 
 ## Summaries Students
 
-## Plot: Combined Effect Sizes by Candidate
+### Plot: Combined Effect Sizes by Candidate
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 Smith.for.plot.combined.student = as.data.frame(cbind(
@@ -1386,10 +1390,11 @@ ggplot() +
         theme_bw() + 
         scale_x_discrete(name='Model', labels = c(gsub(".Williams", "", as.character(levels(data.p.Williams.student$x))))) +
         scale_y_continuous(name='D-Equivalent Statistic') +
-        geom_hline(yintercept=0,  linetype="dashed", color = "red", size=1)
+        geom_hline(yintercept=0,  linetype="dashed", color = "red", size=1) +
+        theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-#### Table: Combined Effect Sizes by Variable
+### Table: Combined Effect Sizes by Variable
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 #### Smith #### 
@@ -1650,7 +1655,7 @@ mean(coefficients.all.table.student$Coefficient[coefficients.all.table.student$M
 ```
 
 
-### Detail
+#### Detail
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 table.df.student
 ```
@@ -2722,7 +2727,7 @@ ggplot() +
 
 ## Summaries MTurkers
 
-## Plot: Combined Effect Sizes by Candidate
+### Plot: Combined Effect Sizes by Candidate
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 Smith.for.plot.combined.mturk = as.data.frame(cbind(
@@ -2766,10 +2771,11 @@ ggplot() +
         theme_bw() + 
         scale_x_discrete(name='Model', labels = c(gsub(".Williams", "", as.character(levels(data.p.Williams.mturk$x))))) +
         scale_y_continuous(name='D-Equivalent Statistic') +
-        geom_hline(yintercept=0,  linetype="dashed", color = "red", size=1)
+        geom_hline(yintercept=0,  linetype="dashed", color = "red", size=1) +
+                theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
-#### Table: Combined Effect Sizes by Variable
+### Table: Combined Effect Sizes by Variable
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 #### Smith #### 
@@ -3030,7 +3036,7 @@ mean(coefficients.all.table.mturk$Coefficient[coefficients.all.table.mturk$Model
 ```
 
 
-### Detail
+#### Detail
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 table.df.mturk
 ```
