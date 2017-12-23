@@ -1251,7 +1251,7 @@ htmlreg(list(c8.tab.4.Williams.student, t31.Williams.student, t35.Williams.stude
 
 
 #### Table 5
-```{r, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, results='asis'}
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 p_load(texreg)
 
@@ -2628,7 +2628,7 @@ htmlreg(list(c8.tab.4.Williams.mturk, t31.Williams.mturk, t35.Williams.mturk, t4
 
 
 #### Table 5
-```{r, eval=FALSE, message=FALSE, warning=FALSE, include=FALSE, results='asis'}
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 p_load(texreg)
 
