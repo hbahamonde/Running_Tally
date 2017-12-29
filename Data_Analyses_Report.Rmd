@@ -55,19 +55,19 @@ pre { /* Code block */
 # Loading the Data
 cat("\014")
 rm(list=ls())
-setwd("/Users/hectorbahamonde/RU/RA/Rick_Lau/Memory_Data")
 
 ## Load the data
-load("/Users/hectorbahamonde/RU/RA/Rick_Lau/Memory_Data/Hector.rdata") ; dat = Hector
+### load library to load SAV file.
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(foreign)
 
-## recode
+dat.student <- read.spss("/Users/hectorbahamonde/RU/RA/Rick_Lau/Memory_Data/HectorStudents.sav", to.data.frame=TRUE)
+dat.mturk <- read.spss("/Users/hectorbahamonde/RU/RA/Rick_Lau/Memory_Data/HectorMTurk.sav", to.data.frame=TRUE)
 
-### generating MTurk dummy (MTurk=1, 0 otherwise)
-dat$MTurk = as.numeric(dat$StudentParent == 3)
-dat$MTurk <- ordered(as.factor(dat$MTurk), levels = c(0,1), labels = c("Rutgers", "MTurk"))
+## rbind both DFs
+dat <- data.frame(rbind(dat.student, dat.mturk))
 
-
-### recoding StudentParent
+## recoding StudentParent
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 p_load(plyr)
 
@@ -76,23 +76,44 @@ dat$StudentParent = mapvalues(
         from = c(
                 levels(as.factor(dat$StudentParent))[1],
                 levels(as.factor(dat$StudentParent))[2],
-                levels(as.factor(dat$StudentParent))[3]), # 3 (for MTurk) will be NA
-        to = c("Student", "Parent", NA))
+                levels(as.factor(dat$StudentParent))[3]),
+        to = c("Student", "Parent", "MTurk"))
+
+## recoding latino
+dat$Latino = as.numeric(dat$Latino)
+dat$Latino[is.na(dat$Latino)] <- 0
+dat$Latino = mapvalues(
+        dat$Latino,
+        from = c(
+                levels(as.factor(dat$Latino))[1],
+                levels(as.factor(dat$Latino))[2]), 
+        to = c("No Latino", "Latino"))
 ```
 
 
-##### Notes
+##### General Notes
 
 - ```Age```, ```YrsEduc```, ```PolSoph```, ```LibCon``` were rescaled. The new range goes from -.5 to .5. The variables used in the models were also rescaled.
-- Now variable ```StudentParent``` has two values, and the following N:
+
+##### Using Separate Datasets (Students and MTurkers)
+
+1. ```Latino``` came in a weird format. I assumed the NA's were missing. After recoding the variable, it has the following N. **Rick: please confirm this N. Please note that these numbers correspond to the merged dataset (merged both the Students and MTurker dataset to simplify coding in the models section)**
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+table(dat$Latino)
+```
+2. ```StudentParent``` has three values, and the following N (total, both Students and MTurkers)
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 table(dat$StudentParent)
 ```
 
-- New variable ```MTurk``` has two values, and the following N:
-```{r , message=FALSE, warning=FALSE, echo=FALSE}
-table(dat$MTurk)
+
+3. ```PrimaryChoice``` has the exact disribution you sent me. This is using the merged version of the two datasets you sent me.
+```{r , message=F, warning=FALSE, echo=T}
+table(dat$PrimaryChoice[dat$StudentParent=="Student"]) # Only Student dataset.
+table(dat$PrimaryChoice[dat$StudentParent=="MTurk"]) # Only MTurkers dataset.
 ```
+
+4. **Please note that that I merged both datasets**.
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
@@ -321,11 +342,11 @@ table(sapply(dat.RWilliams.vars.used, function(x) sum(is.na(x))))
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 1
-c8.tab.1.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m1.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m2.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m3.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m4.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
+c8.tab.1.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m1.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m2.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m3.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m4.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
 
 dv.table.1.Smith.student = colnames(c8.tab.1.Smith.student$model)[1] # name of the DV
 ```
@@ -334,14 +355,14 @@ dv.table.1.Smith.student = colnames(c8.tab.1.Smith.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 2
-c8.tab.2.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m5.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m6.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m7.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m8.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m9.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m10.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-m11.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
+c8.tab.2.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m5.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m6.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m7.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m8.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m9.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m10.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+m11.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
 
 dv.table.2.Smith.student = colnames(c8.tab.2.Smith.student$model)[1] # name of the DV
 ```
@@ -351,15 +372,15 @@ dv.table.2.Smith.student = colnames(c8.tab.2.Smith.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 3
-c8.tab.3.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t1.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t5.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t10.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t14.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t15.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t18.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t21.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t25.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
+c8.tab.3.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t1.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t5.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t10.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t14.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t15.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t18.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t21.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t25.Smith.student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
 
 dv.table.3.Smith.student = colnames(c8.tab.3.Smith.student$model)[1] # name of the DV
 ```
@@ -369,15 +390,15 @@ dv.table.3.Smith.student = colnames(c8.tab.3.Smith.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 4
-c8.tab.4.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t31.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t35.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t40.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t44.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t45.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t48.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t51.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t55.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
+c8.tab.4.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t31.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t35.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t40.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t44.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t45.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t48.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t51.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t55.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
 
 dv.table.4.Smith.student = colnames(c8.tab.4.Smith.student$model)[1] # name of the DV
 ```
@@ -387,15 +408,15 @@ dv.table.4.Smith.student = colnames(c8.tab.4.Smith.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 5
-c8.tab.5.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t61.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t65.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t71.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t75.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t76.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t81.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t85.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
-t86.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$StudentParent=="Student"))
+c8.tab.5.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t61.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t65.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t71.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t75.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t76.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t81.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t85.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+t86.Smith.student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
 
 dv.table.5.Smith.student = colnames(c8.tab.5.Smith.student$model)[1] # name of the DV
 ```
@@ -578,11 +599,11 @@ ggplot() +
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 1
-c8.tab.1.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m1.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m2.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m3.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m4.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
+c8.tab.1.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m1.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m2.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m3.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m4.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
 
 dv.table.1.Wilson.student = colnames(c8.tab.1.Wilson.student$model)[1] # name of the DV
 ```
@@ -591,14 +612,14 @@ dv.table.1.Wilson.student = colnames(c8.tab.1.Wilson.student$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 2
-c8.tab.2.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m5.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m6.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m7.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m8.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m9.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m10.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-m11.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
+c8.tab.2.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m5.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m6.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m7.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m8.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m9.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m10.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+m11.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
 
 dv.table.2.Wilson.student = colnames(c8.tab.2.Wilson.student$model)[1] # name of the DV
 ```
@@ -608,15 +629,15 @@ dv.table.2.Wilson.student = colnames(c8.tab.2.Wilson.student$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 3
-c8.tab.3.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t1.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t5.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t10.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t14.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t15.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t18.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t21.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t25.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
+c8.tab.3.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t1.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t5.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t10.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t14.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t15.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t18.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t21.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t25.Wilson.student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
 
 dv.table.3.Wilson.student = colnames(c8.tab.3.Wilson.student$model)[1] # name of the DV
 ```
@@ -626,15 +647,15 @@ dv.table.3.Wilson.student = colnames(c8.tab.3.Wilson.student$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 4
-c8.tab.4.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t31.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t35.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t40.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t44.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t45.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t48.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t51.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t55.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
+c8.tab.4.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t31.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t35.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t40.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t44.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t45.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t48.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t51.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t55.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
 
 dv.table.4.Wilson.student = colnames(c8.tab.4.Wilson.student$model)[1] # name of the DV
 ```
@@ -644,15 +665,15 @@ dv.table.4.Wilson.student = colnames(c8.tab.4.Wilson.student$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 5
-c8.tab.5.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t61.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t65.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t71.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t75.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t76.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t81.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t85.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
-t86.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$StudentParent=="Student"))
+c8.tab.5.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t61.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t65.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t71.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t75.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t76.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t81.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t85.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+t86.Wilson.student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
 
 dv.table.5.Wilson.student = colnames(c8.tab.5.Wilson.student$model)[1] # name of the DV
 ```
@@ -836,11 +857,11 @@ ggplot() +
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 1
-c8.tab.1.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m1.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m2.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m3.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m4.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
+c8.tab.1.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m1.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m2.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m3.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m4.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
 
 dv.table.1.Jones.student = colnames(c8.tab.1.Jones.student$model)[1] # name of the DV
 ```
@@ -849,14 +870,14 @@ dv.table.1.Jones.student = colnames(c8.tab.1.Jones.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 2
-c8.tab.2.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m5.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m6.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m7.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m8.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m9.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m10.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-m11.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
+c8.tab.2.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m5.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m6.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m7.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m8.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m9.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m10.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+m11.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
 
 dv.table.2.Jones.student = colnames(c8.tab.2.Jones.student$model)[1] # name of the DV
 ```
@@ -866,15 +887,15 @@ dv.table.2.Jones.student = colnames(c8.tab.2.Jones.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 3
-c8.tab.3.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t1.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t5.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t10.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t14.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t15.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t18.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t21.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t25.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
+c8.tab.3.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t1.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t5.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t10.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t14.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t15.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t18.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t21.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t25.Jones.student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
 
 dv.table.3.Jones.student = colnames(c8.tab.3.Jones.student$model)[1] # name of the DV
 ```
@@ -883,15 +904,15 @@ dv.table.3.Jones.student = colnames(c8.tab.3.Jones.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 4
-c8.tab.4.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t31.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t35.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t40.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t44.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t45.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t48.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t51.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t55.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
+c8.tab.4.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t31.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t35.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t40.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t44.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t45.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t48.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t51.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t55.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
 
 dv.table.4.Jones.student = colnames(c8.tab.4.Jones.student$model)[1] # name of the DV
 ```
@@ -901,15 +922,15 @@ dv.table.4.Jones.student = colnames(c8.tab.4.Jones.student$model)[1] # name of t
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 5
-c8.tab.5.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t61.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t65.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t71.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t75.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t76.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t81.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t85.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
-t86.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$StudentParent=="Student"))
+c8.tab.5.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t61.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t65.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t71.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t75.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t76.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t81.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t85.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+t86.Jones.student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
 
 dv.table.5.Jones.student = colnames(c8.tab.5.Jones.student$model)[1] # name of the DV
 ```
@@ -1093,11 +1114,11 @@ ggplot() +
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 1
-c8.tab.1.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m1.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m2.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m3.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m4.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
+c8.tab.1.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m1.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m2.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m3.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m4.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
 
 dv.table.1.Williams.student = colnames(c8.tab.1.Williams.student$model)[1] # name of the DV
 ```
@@ -1106,14 +1127,14 @@ dv.table.1.Williams.student = colnames(c8.tab.1.Williams.student$model)[1] # nam
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 2
-c8.tab.2.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m5.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m6.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m7.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m8.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m9.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m10.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-m11.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
+c8.tab.2.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m5.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m6.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m7.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m8.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m9.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m10.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+m11.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
 
 dv.table.2.Williams.student = colnames(c8.tab.2.Williams.student$model)[1] # name of the DV
 ```
@@ -1123,15 +1144,15 @@ dv.table.2.Williams.student = colnames(c8.tab.2.Williams.student$model)[1] # nam
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 3
-c8.tab.3.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t1.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t5.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t10.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t14.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t15.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t18.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t21.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t25.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
+c8.tab.3.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t1.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t5.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t10.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t14.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t15.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t18.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t21.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t25.Williams.student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
 
 dv.table.3.Williams.student = colnames(c8.tab.3.Williams.student$model)[1] # name of the DV
 ```
@@ -1140,15 +1161,15 @@ dv.table.3.Williams.student = colnames(c8.tab.3.Williams.student$model)[1] # nam
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 4
-c8.tab.4.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t31.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t35.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t40.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t44.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t45.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t48.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t51.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t55.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
+c8.tab.4.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t31.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t35.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t40.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t44.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t45.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t48.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t51.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t55.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
 
 dv.table.4.Williams.student = colnames(c8.tab.4.Williams.student$model)[1] # name of the DV
 ```
@@ -1158,15 +1179,15 @@ dv.table.4.Williams.student = colnames(c8.tab.4.Williams.student$model)[1] # nam
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 5
-c8.tab.5.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t61.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t65.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t71.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t75.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t76.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t81.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t85.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
-t86.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$StudentParent=="Student"))
+c8.tab.5.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t61.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t65.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t71.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t75.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t76.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t81.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t85.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+t86.Williams.student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
 
 dv.table.5.Williams.student = colnames(c8.tab.5.Williams.student$model)[1] # name of the DV
 ```
@@ -1698,11 +1719,11 @@ mean(table.df.student$Mean[12:35])
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 1
-c8.tab.1.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m1.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m2.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m3.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m4.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
+c8.tab.1.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m1.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m2.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m3.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m4.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
 
 dv.table.1.Smith.mturk = colnames(c8.tab.1.Smith.mturk$model)[1] # name of the DV
 ```
@@ -1711,14 +1732,14 @@ dv.table.1.Smith.mturk = colnames(c8.tab.1.Smith.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 2
-c8.tab.2.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m5.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m6.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m7.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m8.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m9.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m10.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-m11.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
+c8.tab.2.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m5.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m6.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m7.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m8.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m9.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m10.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+m11.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
 
 dv.table.2.Smith.mturk = colnames(c8.tab.2.Smith.mturk$model)[1] # name of the DV
 ```
@@ -1728,15 +1749,15 @@ dv.table.2.Smith.mturk = colnames(c8.tab.2.Smith.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 3
-c8.tab.3.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t1.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t5.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t10.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t14.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t15.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t18.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t21.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t25.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
+c8.tab.3.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t1.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t5.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t10.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t14.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t15.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t18.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t21.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmith25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t25.Smith.mturk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls, "DSmithWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
 
 dv.table.3.Smith.mturk = colnames(c8.tab.3.Smith.mturk$model)[1] # name of the DV
 ```
@@ -1746,15 +1767,15 @@ dv.table.3.Smith.mturk = colnames(c8.tab.3.Smith.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 4
-c8.tab.4.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t31.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t35.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t40.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t44.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t45.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t48.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t51.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t55.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
+c8.tab.4.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t31.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t35.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t40.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t44.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t45.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t48.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t51.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmith29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t55.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
 
 dv.table.4.Smith.mturk = colnames(c8.tab.4.Smith.mturk$model)[1] # name of the DV
 ```
@@ -1764,15 +1785,15 @@ dv.table.4.Smith.mturk = colnames(c8.tab.4.Smith.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Smith Models
 # Table 5
-c8.tab.5.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t61.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t65.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t71.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t75.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t76.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t81.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t85.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
-t86.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat$MTurk=="MTurk"))
+c8.tab.5.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t61.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t65.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t71.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t75.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t76.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t81.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t85.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+t86.Smith.mturk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls, "DSmithMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
 
 dv.table.5.Smith.mturk = colnames(c8.tab.5.Smith.mturk$model)[1] # name of the DV
 ```
@@ -1955,11 +1976,11 @@ ggplot() +
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 1
-c8.tab.1.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m1.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m2.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m3.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m4.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
+c8.tab.1.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m1.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m2.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m3.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m4.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
 
 dv.table.1.Wilson.mturk = colnames(c8.tab.1.Wilson.mturk$model)[1] # name of the DV
 ```
@@ -1968,14 +1989,14 @@ dv.table.1.Wilson.mturk = colnames(c8.tab.1.Wilson.mturk$model)[1] # name of the
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 2
-c8.tab.2.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m5.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m6.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m7.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m8.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m9.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m10.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-m11.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
+c8.tab.2.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m5.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m6.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m7.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m8.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m9.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m10.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+m11.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
 
 dv.table.2.Wilson.mturk = colnames(c8.tab.2.Wilson.mturk$model)[1] # name of the DV
 ```
@@ -1985,15 +2006,15 @@ dv.table.2.Wilson.mturk = colnames(c8.tab.2.Wilson.mturk$model)[1] # name of the
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 3
-c8.tab.3.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t1.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t5.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t10.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t14.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t15.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t18.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t21.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t25.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
+c8.tab.3.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t1.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t5.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t10.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t14.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t15.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t18.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t21.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilson25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t25.Wilson.mturk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls, "DWilsonWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
 
 dv.table.3.Wilson.mturk = colnames(c8.tab.3.Wilson.mturk$model)[1] # name of the DV
 ```
@@ -2003,15 +2024,15 @@ dv.table.3.Wilson.mturk = colnames(c8.tab.3.Wilson.mturk$model)[1] # name of the
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 4
-c8.tab.4.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t31.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t35.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t40.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t44.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t45.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t48.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t51.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t55.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
+c8.tab.4.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t31.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t35.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t40.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t44.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t45.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t48.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t51.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilson29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t55.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
 
 dv.table.4.Wilson.mturk = colnames(c8.tab.4.Wilson.mturk$model)[1] # name of the DV
 ```
@@ -2021,15 +2042,15 @@ dv.table.4.Wilson.mturk = colnames(c8.tab.4.Wilson.mturk$model)[1] # name of the
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Wilson Models
 # Table 5
-c8.tab.5.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t61.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t65.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t71.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t75.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t76.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t81.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t85.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
-t86.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat$MTurk=="MTurk"))
+c8.tab.5.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t61.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t65.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t71.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t75.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t76.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t81.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t85.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+t86.Wilson.mturk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls, "DWilsonMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
 
 dv.table.5.Wilson.mturk = colnames(c8.tab.5.Wilson.mturk$model)[1] # name of the DV
 ```
@@ -2213,11 +2234,11 @@ ggplot() +
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 1
-c8.tab.1.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m1.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m2.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m3.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m4.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
+c8.tab.1.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m1.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m2.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m3.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m4.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
 
 dv.table.1.Jones.mturk = colnames(c8.tab.1.Jones.mturk$model)[1] # name of the DV
 ```
@@ -2226,14 +2247,14 @@ dv.table.1.Jones.mturk = colnames(c8.tab.1.Jones.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 2
-c8.tab.2.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m5.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m6.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m7.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m8.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m9.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m10.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-m11.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
+c8.tab.2.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m5.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m6.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m7.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m8.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m9.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m10.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+m11.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
 
 dv.table.2.Jones.mturk = colnames(c8.tab.2.Jones.mturk$model)[1] # name of the DV
 ```
@@ -2243,15 +2264,15 @@ dv.table.2.Jones.mturk = colnames(c8.tab.2.Jones.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 3
-c8.tab.3.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t1.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t5.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t10.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t14.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t15.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t18.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t21.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t25.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
+c8.tab.3.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t1.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t5.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t10.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t14.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t15.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t18.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t21.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJones25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t25.Jones.mturk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls, "RJonesWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
 
 dv.table.3.Jones.mturk = colnames(c8.tab.3.Jones.mturk$model)[1] # name of the DV
 ```
@@ -2260,15 +2281,15 @@ dv.table.3.Jones.mturk = colnames(c8.tab.3.Jones.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 4
-c8.tab.4.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t31.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t35.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t40.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t44.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t45.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t48.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t51.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t55.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
+c8.tab.4.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t31.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t35.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t40.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t44.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t45.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t48.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t51.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJones29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t55.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
 
 dv.table.4.Jones.mturk = colnames(c8.tab.4.Jones.mturk$model)[1] # name of the DV
 ```
@@ -2278,15 +2299,15 @@ dv.table.4.Jones.mturk = colnames(c8.tab.4.Jones.mturk$model)[1] # name of the D
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Jones Models
 # Table 5
-c8.tab.5.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t61.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t65.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t71.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t75.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t76.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t81.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t85.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
-t86.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat$MTurk=="MTurk"))
+c8.tab.5.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t61.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t65.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t71.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t75.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t76.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t81.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t85.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+t86.Jones.mturk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls, "RJonesMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
 
 dv.table.5.Jones.mturk = colnames(c8.tab.5.Jones.mturk$model)[1] # name of the DV
 ```
@@ -2470,11 +2491,11 @@ ggplot() +
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 1
-c8.tab.1.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m1.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m2.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m3.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m4.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
+c8.tab.1.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m1.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m2.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff50"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m3.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m4.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff5"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
 
 dv.table.1.Williams.mturk = colnames(c8.tab.1.Williams.mturk$model)[1] # name of the DV
 ```
@@ -2483,14 +2504,14 @@ dv.table.1.Williams.mturk = colnames(c8.tab.1.Williams.mturk$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 2
-c8.tab.2.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m5.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m6.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m7.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m8.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m9.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m10.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-m11.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
+c8.tab.2.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m5.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m6.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWDifAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m7.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m8.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMemAff0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m9.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsIWMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m10.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccRecogMemAff10"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+m11.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsAccAccessedRecogMemAff"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
 
 dv.table.2.Williams.mturk = colnames(c8.tab.2.Williams.mturk$model)[1] # name of the DV
 ```
@@ -2500,15 +2521,15 @@ dv.table.2.Williams.mturk = colnames(c8.tab.2.Williams.mturk$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 3
-c8.tab.3.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t1.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t5.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t10.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t14.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t15.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t18.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t21.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t25.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
+c8.tab.3.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t1.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t5.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t10.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t14.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t15.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t18.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk25WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t21.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliams25Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t25.Williams.mturk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk5WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
 
 dv.table.3.Williams.mturk = colnames(c8.tab.3.Williams.mturk$model)[1] # name of the DV
 ```
@@ -2517,15 +2538,15 @@ dv.table.3.Williams.mturk = colnames(c8.tab.3.Williams.mturk$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 4
-c8.tab.4.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t31.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t35.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t40.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t44.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t45.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t48.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t51.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t55.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
+c8.tab.4.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t31.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t35.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t40.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t44.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t45.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t48.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk29WeeklyPBTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t51.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliams29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t55.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9WeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
 
 dv.table.4.Williams.mturk = colnames(c8.tab.4.Williams.mturk$model)[1] # name of the DV
 ```
@@ -2535,15 +2556,15 @@ dv.table.4.Williams.mturk = colnames(c8.tab.4.Williams.mturk$model)[1] # name of
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Williams Models
 # Table 5
-c8.tab.5.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t61.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t65.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t71.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t75.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t76.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t81.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t85.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
-t86.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat$MTurk=="MTurk"))
+c8.tab.5.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(controls, collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t61.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t65.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally0"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t71.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t75.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t76.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB1"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t81.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29Cumu2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t85.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsWk9MRWeeklyTally2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+t86.Williams.mturk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls, "RWilliamsMR29PB2"), collapse=" + "), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
 
 dv.table.5.Williams.mturk = colnames(c8.tab.5.Williams.mturk$model)[1] # name of the DV
 ```
