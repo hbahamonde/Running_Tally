@@ -3090,3 +3090,528 @@ mean(table.df.mturk$Mean[1:11])
 # All Tally
 mean(table.df.mturk$Mean[12:35])
 ```
+
+
+# Study 3: Hypotheses Testing
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+# Declare competing variables to be passed to the models.
+
+## H1.A
+tally.affective.variables.Smith.H1.A = c("DSmithMemAff5", "DSmithWk5WeeklyTally0")
+tally.affective.variables.Wilson.H1.A = c("DWilsonMemAff5", "DWilsonWk5WeeklyTally0")
+tally.affective.variables.Jones.H1.A = c("RJonesMemAff5", "RJonesWk5WeeklyTally0")
+tally.affective.variables.Williams.H1.A = c("RWilliamsMemAff5", "RWilliamsWk5WeeklyTally0")
+
+## H1.B.1
+tally.affective.variables.Smith.H1.B.1 = c("DSmithDifAff", "DSmithWk9WeeklyTally0")
+tally.affective.variables.Wilson.H1.B.1 = c("DWilsonDifAff", "DWilsonWk9WeeklyTally0")
+tally.affective.variables.Jones.H1.B.1 = c("RJonesDifAff", "RJonesWk9WeeklyTally0")
+tally.affective.variables.Williams.H1.B.1 = c("RWilliamsDifAff", "RWilliamsWk9WeeklyTally0")
+
+## H1.B.2
+tally.affective.variables.Smith.H1.B.2 = c("DSmithDifAff", "DSmithWk9MRWeeklyTally0")
+tally.affective.variables.Wilson.H1.B.2 = c("DWilsonDifAff", "DWilsonWk9MRWeeklyTally0")
+tally.affective.variables.Jones.H1.B.2 = c("RJonesDifAff", "RJonesWk9MRWeeklyTally0")
+tally.affective.variables.Williams.H1.B.2 = c("RWilliamsDifAff", "RWilliamsWk9MRWeeklyTally0")
+
+## H1.B.3
+tally.affective.variables.Smith.H1.B.3 = c("DSmithAccRecogMemAff10", "DSmithWk9WeeklyTally0")
+tally.affective.variables.Wilson.H1.B.3 = c("DWilsonAccRecogMemAff10", "DWilsonWk9WeeklyTally0")
+tally.affective.variables.Jones.H1.B.3 = c("RJonesAccRecogMemAff10", "RJonesWk9WeeklyTally0")
+tally.affective.variables.Williams.H1.B.3 = c("RWilliamsAccRecogMemAff10", "RWilliamsWk9WeeklyTally0")
+
+## H1.B.4
+tally.affective.variables.Smith.H1.B.4 = c("DSmithAccRecogMemAff10", "DSmithWk9MRWeeklyTally0")
+tally.affective.variables.Wilson.H1.B.4 = c("DWilsonAccRecogMemAff10", "DWilsonWk9MRWeeklyTally0")
+tally.affective.variables.Jones.H1.B.4 = c("RJonesAccRecogMemAff10", "RJonesWk9MRWeeklyTally0")
+tally.affective.variables.Williams.H1.B.4 = c("RWilliamsAccRecogMemAff10", "RWilliamsWk9MRWeeklyTally0")
+
+## H2.A.1
+tally.affective.variables.Smith.H2.A.1 = c("DSmithMemAff5", "DSmithWk4WeeklyTally0", "DSmithJustWk5RT0")
+tally.affective.variables.Wilson.H2.A.1 = c("DWilsonMemAff5", "DWilsonWk4WeeklyTally0", "DWilsonJustWk5RT0")
+tally.affective.variables.Jones.H2.A.1 = c("RJonesMemAff5", "RJonesWk4WeeklyTally0", "RJonesJustWk5RT0")
+tally.affective.variables.Williams.H2.A.1 = c("RWilliamsMemAff5", "RWilliamsWk4WeeklyTally0", "RWilliamsJustWk5RT0")
+
+
+## H2.A.2
+tally.affective.variables.Smith.H2.A.2 = c("DSmithDifAff", "DSmithWk8WeeklyTally0", "DSmithJustWk9RT0")
+tally.affective.variables.Wilson.H2.A.2 = c("DWilsonDifAff", "DWilsonWk8WeeklyTally0", "DWilsonJustWk9RT0")
+tally.affective.variables.Jones.H2.A.2 = c("RJonesDifAff", "RJonesWk8WeeklyTally0", "RJonesJustWk9RT0")
+tally.affective.variables.Williams.H2.A.2 = c("RWilliamsDifAff", "RWilliamsWk8WeeklyTally0", "RWilliamsJustWk9RT0")
+
+
+## H2.A.3
+tally.affective.variables.Smith.H2.A.3 = c("DSmithAccRecogMemAff10", "DSmithWk8WeeklyTally0", "DSmithJustWk9RT0")
+tally.affective.variables.Wilson.H2.A.3 = c("DWilsonAccRecogMemAff10", "DWilsonWk8WeeklyTally0", "DSmithJustWk9RT0")
+tally.affective.variables.Jones.H2.A.3 = c("RJonesAccRecogMemAff10", "RJonesWk8WeeklyTally0", "RJonesJustWk9RT0")
+tally.affective.variables.Williams.H2.A.3 = c("RWilliamsAccRecogMemAff10", "RWilliamsWk8WeeklyTally0", "RWilliamsJustWk9RT0")
+
+## H2.A.4
+tally.affective.variables.Smith.H2.A.4 = c("DSmithDifAff", "DSmithWk8MRWeeklyTally0", "DSmithJustWk9MRRT0")
+tally.affective.variables.Wilson.H2.A.4 = c("DWilsonDifAff", "DWilsonWk8MRWeeklyTally0", "DWilsonJustWk9MRRT0")
+tally.affective.variables.Jones.H2.A.4 = c("RJonesDifAff", "RJonesWk8MRWeeklyTally0", "RJonesJustWk9MRRT0")
+tally.affective.variables.Williams.H2.A.4 = c("RWilliamsDifAff", "RWilliamsWk8MRWeeklyTally0", "RWilliamsJustWk9MRRT0")
+
+## H2.A.5
+tally.affective.variables.Smith.H2.A.5 = c("DSmithAccRecogMemAff10", "DSmithWk8MRWeeklyTally0", "DSmithJustWk9MRRT0")
+tally.affective.variables.Wilson.H2.A.5 = c("DWilsonAccRecogMemAff10", "DWilsonWk8MRWeeklyTally0", "DWilsonJustWk9MRRT0")
+tally.affective.variables.Jones.H2.A.5 = c("RJonesAccRecogMemAff10", "RJonesWk8MRWeeklyTally0", "RJonesJustWk9MRRT0")
+tally.affective.variables.Williams.H2.A.5 = c("RWilliamsAccRecogMemAff10", "RWilliamsWk8MRWeeklyTally0", "RWilliamsJustWk9MRRT0")
+```
+
+
+
+
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 A: Student Sample [W5]
+s3.H1.A.Smith.Student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H1.A.Wilson.Student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H1.A.Jones.Student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H1.A.Williams.Student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H1.A.Smith.Student = colnames(s3.H1.A.Smith.Student$model)[1] 
+dv.s3.H1.A.Wilson.Student = colnames(s3.H1.A.Wilson.Student$model)[1] 
+dv.s3.H1.A.Jones.Student = colnames(s3.H1.A.Jones.Student$model)[1] 
+dv.s3.H1.A.Williams.Student = colnames(s3.H1.A.Williams.Student$model)[1] 
+```
+
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 A: MTurk Sample [W5]
+s3.H1.A.Smith.MTurk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H1.A.Wilson.MTurk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H1.A.Jones.MTurk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H1.A.Williams.MTurk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H1.A.Smith.MTurk = colnames(s3.H1.A.Smith.MTurk$model)[1] 
+dv.s3.H1.A.Wilson.MTurk = colnames(s3.H1.A.Wilson.MTurk$model)[1]  
+dv.s3.H1.A.Jones.MTurk = colnames(s3.H1.A.Jones.MTurk$model)[1]  
+dv.s3.H1.A.Williams.MTurk = colnames(s3.H1.A.Williams.MTurk$model)[1]  
+```
+
+
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.1: Student Sample [W10]
+s3.H1.B.1.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H1.B.1.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H1.B.1.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H1.B.1.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H1.B.1.Smith.Student = colnames(s3.H1.B.1.Smith.Student$model)[1]  
+dv.s3.H1.B.1.Wilson.Student = colnames(s3.H1.B.1.Wilson.Student$model)[1]  
+dv.s3.H1.B.1.Jones.Student = colnames(s3.H1.B.1.Jones.Student$model)[1]  
+dv.s3.H1.B.1.Williams.Student = colnames(s3.H1.B.1.Williams.Student$model)[1]  
+```
+
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.1: MTurk Sample [W10]
+s3.H1.B.1.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H1.B.1.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H1.B.1.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H1.B.1.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H1.B.1.Smith.MTurk = colnames(s3.H1.B.1.Smith.MTurk$model)[1]
+dv.s3.H1.B.1.Wilson.MTurk = colnames(s3.H1.B.1.Wilson.MTurk$model)[1]
+dv.s3.H1.B.1.Jones.MTurk = colnames(s3.H1.B.1.Jones.MTurk$model)[1]
+dv.s3.H1.B.1.Williams.MTurk = colnames(s3.H1.B.1.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.2: Student Sample [W10]
+s3.H1.B.2.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H1.B.2.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H1.B.2.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H1.B.2.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H1.B.2.Smith.Student = colnames(s3.H1.B.2.Smith.Student$model)[1]
+dv.s3.H1.B.2.Wilson.Student = colnames(s3.H1.B.2.Wilson.Student$model)[1]
+dv.s3.H1.B.2.Jones.Student = colnames(s3.H1.B.2.Jones.Student$model)[1]
+dv.s3.H1.B.2.Williams.Student = colnames(s3.H1.B.2.Williams.Student$model)[1]
+```
+
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.2: MTurk Sample [W10]
+s3.H1.B.2.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H1.B.2.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H1.B.2.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H1.B.2.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H1.B.2.Smith.MTurk = colnames(s3.H1.B.2.Smith.MTurk$model)[1]
+dv.s3.H1.B.2.Wilson.MTurk = colnames(s3.H1.B.2.Wilson.MTurk$model)[1]
+dv.s3.H1.B.2.Jones.MTurk = colnames(s3.H1.B.2.Jones.MTurk$model)[1]
+dv.s3.H1.B.2.Williams.MTurk = colnames(s3.H1.B.2.Williams.MTurk$model)[1]
+```
+
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.3: Student Sample [W10]
+s3.H1.B.3.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H1.B.3.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H1.B.3.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H1.B.3.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H1.B.3.Smith.Student = colnames(s3.H1.B.3.Smith.Student$model)[1]
+dv.s3.H1.B.3.Wilson.Student = colnames(s3.H1.B.3.Wilson.Student$model)[1]
+dv.s3.H1.B.3.Jones.Student = colnames(s3.H1.B.3.Jones.Student$model)[1]
+dv.s3.H1.B.3.Williams.Student = colnames(s3.H1.B.3.Williams.Student$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.3: MTurk Sample [W10]
+s3.H1.B.3.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H1.B.3.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H1.B.3.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H1.B.3.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H1.B.3.Smith.MTurk = colnames(s3.H1.B.3.Smith.MTurk$model)[1]
+dv.s3.H1.B.3.Wilson.MTurk = colnames(s3.H1.B.3.Wilson.MTurk$model)[1]
+dv.s3.H1.B.3.Jones.MTurk = colnames(s3.H1.B.3.Jones.MTurk$model)[1]
+dv.s3.H1.B.3.Williams.MTurk = colnames(s3.H1.B.3.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.4: Student Sample [W10]
+s3.H1.B.4.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H1.B.4.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H1.B.4.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H1.B.4.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H1.B.4.Smith.Student = colnames(s3.H1.B.4.Smith.Student$model)[1]
+dv.s3.H1.B.4.Wilson.Student = colnames(s3.H1.B.4.Wilson.Student$model)[1]
+dv.s3.H1.B.4.Jones.Student = colnames(s3.H1.B.4.Jones.Student$model)[1]
+dv.s3.H1.B.4.Williams.Student = colnames(s3.H1.B.4.Williams.Student$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H1 B.4: MTurk Sample [W10]
+s3.H1.B.4.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H1.B.4.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H1.B.4.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H1.B.4.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H1.B.4.Smith.MTurk = colnames(s3.H1.B.4.Smith.MTurk$model)[1]
+dv.s3.H1.B.4.Wilson.MTurk = colnames(s3.H1.B.4.Wilson.MTurk$model)[1]
+dv.s3.H1.B.4.Jones.MTurk = colnames(s3.H1.B.4.Jones.MTurk$model)[1]
+dv.s3.H1.B.4.Williams.MTurk = colnames(s3.H1.B.4.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.1: Student Sample [W5]
+s3.H2.A.1.Smith.Student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H2.A.1.Wilson.Student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H2.A.1.Jones.Student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H2.A.1.Williams.Student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H2.A.1.Smith.Student = colnames(s3.H2.A.1.Smith.Student$model)[1]
+dv.s3.H2.A.1.Wilson.Student = colnames(s3.H2.A.1.Wilson.Student$model)[1]
+dv.s3.H2.A.1.Jones.Student = colnames(s3.H2.A.1.Jones.Student$model)[1]
+dv.s3.H2.A.1.Williams.Student = colnames(s3.H2.A.1.Williams.Student$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.1: MTurk Sample [W5]
+s3.H2.A.1.Smith.MTurk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H2.A.1.Wilson.MTurk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H2.A.1.Jones.MTurk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H2.A.1.Williams.MTurk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H2.A.1.Smith.MTurk = colnames(s3.H2.A.1.Smith.MTurk$model)[1]
+dv.s3.H2.A.1.Wilson.MTurk = colnames(s3.H2.A.1.Wilson.MTurk$model)[1]
+dv.s3.H2.A.1.Jones.MTurk = colnames(s3.H2.A.1.Jones.MTurk$model)[1]
+dv.s3.H2.A.1.Williams.MTurk = colnames(s3.H2.A.1.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.2: Student Sample [W10]
+s3.H2.A.2.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H2.A.2.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H2.A.2.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H2.A.2.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H2.A.2.Smith.Student = colnames(s3.H2.A.2.Smith.Student$model)[1]
+dv.s3.H2.A.2.Wilson.Student = colnames(s3.H2.A.2.Wilson.Student$model)[1]
+dv.s3.H2.A.2.Jones.Student = colnames(s3.H2.A.2.Jones.Student$model)[1]
+dv.s3.H2.A.2.Williams.Student = colnames(s3.H2.A.2.Williams.Student$model)[1]
+```
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.2: MTurk Sample [W10]
+s3.H2.A.2.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H2.A.2.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H2.A.2.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H2.A.2.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H2.A.2.Smith.MTurk = colnames(s3.H2.A.2.Smith.MTurk$model)[1]
+dv.s3.H2.A.2.Wilson.MTurk = colnames(s3.H2.A.2.Wilson.MTurk$model)[1]
+dv.s3.H2.A.2.Jones.MTurk = colnames(s3.H2.A.2.Jones.MTurk$model)[1]
+dv.s3.H2.A.2.Williams.MTurk = colnames(s3.H2.A.2.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.3: Student Sample [W10]
+s3.H2.A.3.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H2.A.3.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H2.A.3.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H2.A.3.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H2.A.3.Smith.Student = colnames(s3.H2.A.3.Smith.Student$model)[1]
+dv.s3.H2.A.3.Wilson.Student = colnames(s3.H2.A.3.Wilson.Student$model)[1]
+dv.s3.H2.A.3.Jones.Student = colnames(s3.H2.A.3.Jones.Student$model)[1]
+dv.s3.H2.A.3.Williams.Student = colnames(s3.H2.A.3.Williams.Student$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.3: MTurk Sample [W10]
+s3.H2.A.3.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H2.A.3.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H2.A.3.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H2.A.3.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H2.A.3.Smith.MTurk = colnames(s3.H2.A.3.Smith.MTurk$model)[1]
+dv.s3.H2.A.3.Wilson.MTurk = colnames(s3.H2.A.3.Wilson.MTurk$model)[1]
+dv.s3.H2.A.3.Jones.MTurk = colnames(s3.H2.A.3.Jones.MTurk$model)[1]
+dv.s3.H2.A.3.Williams.MTurk = colnames(s3.H2.A.3.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.4: Student Sample [W10]
+s3.H2.A.4.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H2.A.4.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H2.A.4.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H2.A.4.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H2.A.4.Smith.Student = colnames(s3.H2.A.4.Smith.Student$model)[1]
+dv.s3.H2.A.4.Wilson.Student = colnames(s3.H2.A.4.Wilson.Student$model)[1]
+dv.s3.H2.A.4.Jones.Student = colnames(s3.H2.A.4.Jones.Student$model)[1]
+dv.s3.H2.A.4.Williams.Student = colnames(s3.H2.A.4.Williams.Student$model)[1]
+```
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.4: MTurk Sample [W10]
+s3.H2.A.4.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H2.A.4.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H2.A.4.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H2.A.4.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H2.A.4.Smith.MTurk = colnames(s3.H2.A.4.Smith.MTurk$model)[1]
+dv.s3.H2.A.4.Wilson.MTurk = colnames(s3.H2.A.4.Wilson.MTurk$model)[1]
+dv.s3.H2.A.4.Jones.MTurk = colnames(s3.H2.A.4.Jones.MTurk$model)[1]
+dv.s3.H2.A.4.Williams.MTurk = colnames(s3.H2.A.4.Williams.MTurk$model)[1]
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.5: Student Sample [W10]
+s3.H2.A.5.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
+s3.H2.A.5.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
+s3.H2.A.5.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
+s3.H2.A.5.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+
+# name of the DV
+dv.s3.H2.A.5.Smith.Student = colnames(s3.H2.A.5.Smith.Student$model)[1]
+dv.s3.H2.A.5.Wilson.Student = colnames(s3.H2.A.5.Wilson.Student$model)[1]
+dv.s3.H2.A.5.Jones.Student = colnames(s3.H2.A.5.Jones.Student$model)[1]
+dv.s3.H2.A.5.Williams.Student = colnames(s3.H2.A.5.Williams.Student$model)[1]
+```
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## H2 A.5: MTurk Sample [W10]
+s3.H2.A.5.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
+s3.H2.A.5.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
+s3.H2.A.5.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
+s3.H2.A.5.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+
+# name of the DV
+dv.s3.H2.A.5.Smith.MTurk = colnames(s3.H2.A.5.Smith.MTurk$model)[1]
+dv.s3.H2.A.5.Wilson.MTurk = colnames(s3.H2.A.5.Wilson.MTurk$model)[1]
+dv.s3.H2.A.5.Jones.MTurk = colnames(s3.H2.A.5.Jones.MTurk$model)[1]
+dv.s3.H2.A.5.Williams.MTurk = colnames(s3.H2.A.5.Williams.MTurk$model)[1]
+```
+
+## Smith [Student]
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Smith.Student, s3.H1.B.1.Smith.Student, s3.H1.B.2.Smith.Student, s3.H1.B.3.Smith.Student, s3.H1.B.4.Smith.Student, s3.H2.A.1.Smith.Student, s3.H2.A.2.Smith.Student, s3.H2.A.3.Smith.Student, s3.H2.A.4.Smith.Student, s3.H2.A.5.Smith.Student),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Smith.Student, dv.s3.H1.B.1.Smith.Student, dv.s3.H1.B.2.Smith.Student, dv.s3.H1.B.3.Smith.Student, dv.s3.H1.B.4.Smith.Student, dv.s3.H2.A.1.Smith.Student, dv.s3.H2.A.2.Smith.Student, dv.s3.H2.A.3.Smith.Student, dv.s3.H2.A.4.Smith.Student, dv.s3.H2.A.5.Smith.Student),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+## Smith [MTurk]
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Smith.MTurk, s3.H1.B.1.Smith.MTurk, s3.H1.B.2.Smith.MTurk, s3.H1.B.3.Smith.MTurk, s3.H1.B.4.Smith.MTurk, s3.H2.A.1.Smith.MTurk, s3.H2.A.2.Smith.MTurk, s3.H2.A.3.Smith.MTurk, s3.H2.A.4.Smith.MTurk, s3.H2.A.5.Smith.MTurk),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Smith.MTurk, dv.s3.H1.B.1.Smith.MTurk, dv.s3.H1.B.2.Smith.MTurk, dv.s3.H1.B.3.Smith.MTurk, dv.s3.H1.B.4.Smith.MTurk, dv.s3.H2.A.1.Smith.MTurk, dv.s3.H2.A.2.Smith.MTurk, dv.s3.H2.A.3.Smith.MTurk, dv.s3.H2.A.4.Smith.MTurk, dv.s3.H2.A.5.Smith.MTurk),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+
+## Wilson [Student]
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Wilson.Student, s3.H1.B.1.Wilson.Student, s3.H1.B.2.Wilson.Student, s3.H1.B.3.Wilson.Student, s3.H1.B.4.Wilson.Student, s3.H2.A.1.Wilson.Student, s3.H2.A.2.Wilson.Student, s3.H2.A.3.Wilson.Student, s3.H2.A.4.Wilson.Student, s3.H2.A.5.Wilson.Student),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Wilson.Student, dv.s3.H1.B.1.Wilson.Student, dv.s3.H1.B.2.Wilson.Student, dv.s3.H1.B.3.Wilson.Student, dv.s3.H1.B.4.Wilson.Student, dv.s3.H2.A.1.Wilson.Student, dv.s3.H2.A.2.Wilson.Student, dv.s3.H2.A.3.Wilson.Student, dv.s3.H2.A.4.Wilson.Student, dv.s3.H2.A.5.Wilson.Student),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+## Wilson [MTurk]
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Wilson.MTurk, s3.H1.B.1.Wilson.MTurk, s3.H1.B.2.Wilson.MTurk, s3.H1.B.3.Wilson.MTurk, s3.H1.B.4.Wilson.MTurk, s3.H2.A.1.Wilson.MTurk, s3.H2.A.2.Wilson.MTurk, s3.H2.A.3.Wilson.MTurk, s3.H2.A.4.Wilson.MTurk, s3.H2.A.5.Wilson.MTurk),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Wilson.MTurk, dv.s3.H1.B.1.Wilson.MTurk, dv.s3.H1.B.2.Wilson.MTurk, dv.s3.H1.B.3.Wilson.MTurk, dv.s3.H1.B.4.Wilson.MTurk, dv.s3.H2.A.1.Wilson.MTurk, dv.s3.H2.A.2.Wilson.MTurk, dv.s3.H2.A.3.Wilson.MTurk, dv.s3.H2.A.4.Wilson.MTurk, dv.s3.H2.A.5.Wilson.MTurk),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+## Jones [Student]
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Jones.Student, s3.H1.B.1.Jones.Student, s3.H1.B.2.Jones.Student, s3.H1.B.3.Jones.Student, s3.H1.B.4.Jones.Student, s3.H2.A.1.Jones.Student, s3.H2.A.2.Jones.Student, s3.H2.A.3.Jones.Student, s3.H2.A.4.Jones.Student, s3.H2.A.5.Jones.Student),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Jones.Student, dv.s3.H1.B.1.Jones.Student, dv.s3.H1.B.2.Jones.Student, dv.s3.H1.B.3.Jones.Student, dv.s3.H1.B.4.Jones.Student, dv.s3.H2.A.1.Jones.Student, dv.s3.H2.A.2.Jones.Student, dv.s3.H2.A.3.Jones.Student, dv.s3.H2.A.4.Jones.Student, dv.s3.H2.A.5.Jones.Student),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+## Jones [MTurk]
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Jones.MTurk, s3.H1.B.1.Jones.MTurk, s3.H1.B.2.Jones.MTurk, s3.H1.B.3.Jones.MTurk, s3.H1.B.4.Jones.MTurk, s3.H2.A.1.Jones.MTurk, s3.H2.A.2.Jones.MTurk, s3.H2.A.3.Jones.MTurk, s3.H2.A.4.Jones.MTurk, s3.H2.A.5.Jones.MTurk),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Jones.MTurk, dv.s3.H1.B.1.Jones.MTurk, dv.s3.H1.B.2.Jones.MTurk, dv.s3.H1.B.3.Jones.MTurk, dv.s3.H1.B.4.Jones.MTurk, dv.s3.H2.A.1.Jones.MTurk, dv.s3.H2.A.2.Jones.MTurk, dv.s3.H2.A.3.Jones.MTurk, dv.s3.H2.A.4.Jones.MTurk, dv.s3.H2.A.5.Jones.MTurk),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+## Williams [Student]
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Williams.Student, s3.H1.B.1.Williams.Student, s3.H1.B.2.Williams.Student, s3.H1.B.3.Williams.Student, s3.H1.B.4.Williams.Student, s3.H2.A.1.Williams.Student, s3.H2.A.2.Williams.Student, s3.H2.A.3.Williams.Student, s3.H2.A.4.Williams.Student, s3.H2.A.5.Williams.Student),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Williams.Student, dv.s3.H1.B.1.Williams.Student, dv.s3.H1.B.2.Williams.Student, dv.s3.H1.B.3.Williams.Student, dv.s3.H1.B.4.Williams.Student, dv.s3.H2.A.1.Williams.Student, dv.s3.H2.A.2.Williams.Student, dv.s3.H2.A.3.Williams.Student, dv.s3.H2.A.4.Williams.Student, dv.s3.H2.A.5.Williams.Student),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
+
+## Williams [MTurk]
+```{r , message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(texreg)
+
+htmlreg(list(s3.H1.A.Williams.MTurk, s3.H1.B.1.Williams.MTurk, s3.H1.B.2.Williams.MTurk, s3.H1.B.3.Williams.MTurk, s3.H1.B.4.Williams.MTurk, s3.H2.A.1.Williams.MTurk, s3.H2.A.2.Williams.MTurk, s3.H2.A.3.Williams.MTurk, s3.H2.A.4.Williams.MTurk, s3.H2.A.5.Williams.MTurk),
+        label = "tab:s3.H1.A",
+        custom.note = list(c("%stars. All models, OLS.")),
+        custom.model.names = c(dv.s3.H1.A.Williams.MTurk, dv.s3.H1.B.1.Williams.MTurk, dv.s3.H1.B.2.Williams.MTurk, dv.s3.H1.B.3.Williams.MTurk, dv.s3.H1.B.4.Williams.MTurk, dv.s3.H2.A.1.Williams.MTurk, dv.s3.H2.A.2.Williams.MTurk, dv.s3.H2.A.3.Williams.MTurk, dv.s3.H2.A.4.Williams.MTurk, dv.s3.H2.A.5.Williams.MTurk),
+        #fontsize = "tiny",
+        center = TRUE,
+        digits = 3,
+        table = TRUE,
+        float.pos = "h",
+        caption = ""
+        )
+```
