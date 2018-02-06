@@ -283,7 +283,7 @@ p_load(scales)
 dat$Age = rescale(dat$Age, to = c(-.5,.5))
 dat$YrsEduc = rescale(dat$YrsEduc, to = c(-.5,.5))
 dat$PolSoph = rescale(dat$PolSoph, to = c(-.5,.5))
-dat$LibCon = rescale(dat$LibCon, to = c(-.5,.5))
+dat$LibCon = rescale(as.numeric(dat$LibCon), to = c(-.5,.5))
 ```
 
 ##### Dropping Missing Values
