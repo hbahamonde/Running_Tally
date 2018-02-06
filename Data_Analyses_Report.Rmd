@@ -3143,7 +3143,7 @@ tally.affective.variables.Williams.H2.A.2 = c("RWilliamsDifAff", "RWilliamsWk8We
 
 ## H2.A.3
 tally.affective.variables.Smith.H2.A.3 = c("DSmithAccRecogMemAff10", "DSmithWk8WeeklyTally0", "DSmithJustWk9RT0")
-tally.affective.variables.Wilson.H2.A.3 = c("DWilsonAccRecogMemAff10", "DWilsonWk8WeeklyTally0", "DSmithJustWk9RT0")
+tally.affective.variables.Wilson.H2.A.3 = c("DWilsonAccRecogMemAff10", "DWilsonWk8WeeklyTally0", "DWilsonJustWk9RT0")
 tally.affective.variables.Jones.H2.A.3 = c("RJonesAccRecogMemAff10", "RJonesWk8WeeklyTally0", "RJonesJustWk9RT0")
 tally.affective.variables.Williams.H2.A.3 = c("RWilliamsAccRecogMemAff10", "RWilliamsWk8WeeklyTally0", "RWilliamsJustWk9RT0")
 
