@@ -438,7 +438,8 @@ htmlreg(list(c8.tab.1.Smith.student, m1.Smith.student, m2.Smith.student, m3.Smit
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -457,7 +458,8 @@ htmlreg(list(c8.tab.2.Smith.student, m5.Smith.student, m6.Smith.student, m7.Smit
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -477,7 +479,8 @@ htmlreg(list(c8.tab.3.Smith.student, t1.Smith.student, t5.Smith.student, t10.Smi
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -496,7 +499,8 @@ htmlreg(list(c8.tab.4.Smith.student, t31.Smith.student, t35.Smith.student, t40.S
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -515,7 +519,8 @@ htmlreg(list(c8.tab.5.Smith.student, t61.Smith.student, t65.Smith.student, t71.S
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -695,7 +700,8 @@ htmlreg(list(c8.tab.1.Wilson.student, m1.Wilson.student, m2.Wilson.student, m3.W
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -714,7 +720,8 @@ htmlreg(list(c8.tab.2.Wilson.student, m5.Wilson.student, m6.Wilson.student, m7.W
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -734,7 +741,8 @@ htmlreg(list(c8.tab.3.Wilson.student, t1.Wilson.student, t5.Wilson.student, t10.
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -753,7 +761,8 @@ htmlreg(list(c8.tab.4.Wilson.student, t31.Wilson.student, t35.Wilson.student, t4
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -772,7 +781,8 @@ htmlreg(list(c8.tab.5.Wilson.student, t61.Wilson.student, t65.Wilson.student, t7
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -952,7 +962,8 @@ htmlreg(list(c8.tab.1.Jones.student, m1.Jones.student, m2.Jones.student, m3.Jone
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -971,7 +982,8 @@ htmlreg(list(c8.tab.2.Jones.student, m5.Jones.student, m6.Jones.student, m7.Jone
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -991,7 +1003,8 @@ htmlreg(list(c8.tab.3.Jones.student, t1.Jones.student, t5.Jones.student, t10.Jon
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1010,7 +1023,8 @@ htmlreg(list(c8.tab.4.Jones.student, t31.Jones.student, t35.Jones.student, t40.J
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1029,7 +1043,8 @@ htmlreg(list(c8.tab.5.Jones.student, t61.Jones.student, t65.Jones.student, t71.J
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1209,7 +1224,8 @@ htmlreg(list(c8.tab.1.Williams.student, m1.Williams.student, m2.Williams.student
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1228,7 +1244,8 @@ htmlreg(list(c8.tab.2.Williams.student, m5.Williams.student, m6.Williams.student
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1248,7 +1265,8 @@ htmlreg(list(c8.tab.3.Williams.student, t1.Williams.student, t5.Williams.student
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1267,7 +1285,8 @@ htmlreg(list(c8.tab.4.Williams.student, t31.Williams.student, t35.Williams.stude
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1286,7 +1305,8 @@ htmlreg(list(c8.tab.5.Williams.student, t61.Williams.student, t65.Williams.stude
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1815,7 +1835,8 @@ htmlreg(list(c8.tab.1.Smith.mturk, m1.Smith.mturk, m2.Smith.mturk, m3.Smith.mtur
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1834,7 +1855,8 @@ htmlreg(list(c8.tab.2.Smith.mturk, m5.Smith.mturk, m6.Smith.mturk, m7.Smith.mtur
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1854,7 +1876,8 @@ htmlreg(list(c8.tab.3.Smith.mturk, t1.Smith.mturk, t5.Smith.mturk, t10.Smith.mtu
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1873,7 +1896,8 @@ htmlreg(list(c8.tab.4.Smith.mturk, t31.Smith.mturk, t35.Smith.mturk, t40.Smith.m
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -1892,7 +1916,8 @@ htmlreg(list(c8.tab.5.Smith.mturk, t61.Smith.mturk, t65.Smith.mturk, t71.Smith.m
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2072,7 +2097,8 @@ htmlreg(list(c8.tab.1.Wilson.mturk, m1.Wilson.mturk, m2.Wilson.mturk, m3.Wilson.
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2091,7 +2117,8 @@ htmlreg(list(c8.tab.2.Wilson.mturk, m5.Wilson.mturk, m6.Wilson.mturk, m7.Wilson.
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2111,7 +2138,8 @@ htmlreg(list(c8.tab.3.Wilson.mturk, t1.Wilson.mturk, t5.Wilson.mturk, t10.Wilson
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2130,7 +2158,8 @@ htmlreg(list(c8.tab.4.Wilson.mturk, t31.Wilson.mturk, t35.Wilson.mturk, t40.Wils
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2149,7 +2178,8 @@ htmlreg(list(c8.tab.5.Wilson.mturk, t61.Wilson.mturk, t65.Wilson.mturk, t71.Wils
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2329,7 +2359,8 @@ htmlreg(list(c8.tab.1.Jones.mturk, m1.Jones.mturk, m2.Jones.mturk, m3.Jones.mtur
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2348,7 +2379,8 @@ htmlreg(list(c8.tab.2.Jones.mturk, m5.Jones.mturk, m6.Jones.mturk, m7.Jones.mtur
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2368,7 +2400,8 @@ htmlreg(list(c8.tab.3.Jones.mturk, t1.Jones.mturk, t5.Jones.mturk, t10.Jones.mtu
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2387,7 +2420,8 @@ htmlreg(list(c8.tab.4.Jones.mturk, t31.Jones.mturk, t35.Jones.mturk, t40.Jones.m
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2406,7 +2440,8 @@ htmlreg(list(c8.tab.5.Jones.mturk, t61.Jones.mturk, t65.Jones.mturk, t71.Jones.m
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2586,7 +2621,8 @@ htmlreg(list(c8.tab.1.Williams.mturk, m1.Williams.mturk, m2.Williams.mturk, m3.W
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2605,7 +2641,8 @@ htmlreg(list(c8.tab.2.Williams.mturk, m5.Williams.mturk, m6.Williams.mturk, m7.W
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2625,7 +2662,8 @@ htmlreg(list(c8.tab.3.Williams.mturk, t1.Williams.mturk, t5.Williams.mturk, t10.
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2644,7 +2682,8 @@ htmlreg(list(c8.tab.4.Williams.mturk, t31.Williams.mturk, t35.Williams.mturk, t4
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -2663,7 +2702,8 @@ htmlreg(list(c8.tab.5.Williams.mturk, t61.Williams.mturk, t65.Williams.mturk, t7
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3483,7 +3523,8 @@ htmlreg(list(s3.H1.A.Smith.Student, s3.H1.B.1.Smith.Student, s3.H1.B.2.Smith.Stu
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3501,7 +3542,8 @@ htmlreg(list(s3.H1.A.Smith.MTurk, s3.H1.B.1.Smith.MTurk, s3.H1.B.2.Smith.MTurk, 
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3521,7 +3563,8 @@ htmlreg(list(s3.H1.A.Wilson.Student, s3.H1.B.1.Wilson.Student, s3.H1.B.2.Wilson.
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3539,7 +3582,8 @@ htmlreg(list(s3.H1.A.Wilson.MTurk, s3.H1.B.1.Wilson.MTurk, s3.H1.B.2.Wilson.MTur
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3558,7 +3602,8 @@ htmlreg(list(s3.H1.A.Jones.Student, s3.H1.B.1.Jones.Student, s3.H1.B.2.Jones.Stu
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3576,7 +3621,8 @@ htmlreg(list(s3.H1.A.Jones.MTurk, s3.H1.B.1.Jones.MTurk, s3.H1.B.2.Jones.MTurk, 
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3595,7 +3641,8 @@ htmlreg(list(s3.H1.A.Williams.Student, s3.H1.B.1.Williams.Student, s3.H1.B.2.Wil
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
 
@@ -3613,6 +3660,7 @@ htmlreg(list(s3.H1.A.Williams.MTurk, s3.H1.B.1.Williams.MTurk, s3.H1.B.2.William
         digits = 3,
         table = TRUE,
         float.pos = "h",
-        caption = ""
+        caption = "",  
+        doctype = FALSE
         )
 ```
