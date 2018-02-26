@@ -116,6 +116,34 @@ table(dat$PrimaryChoice[dat$StudentParent=="MTurk"]) # Only MTurkers dataset.
 
 4. **Please note that that I merged both datasets**.
 
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## Define Control Variables for all models.
+controls = c("Female", "Age", "YrsEduc", "Black", "Latino", "PolSoph", "LibCon", "PanelLength")
+
+## centering all control variables
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(scales)
+
+dat$Age = rescale(dat$Age, to = c(-.5,.5))
+dat$YrsEduc = rescale(dat$YrsEduc, to = c(-.5,.5))
+dat$PolSoph = rescale(dat$PolSoph, to = c(-.5,.5))
+dat$LibCon = rescale(as.numeric(dat$LibCon), to = c(-.5,.5))
+
+# recoding PanelLength (which is a control var.)
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(car)
+dat$PanelLength <- recode(dat$PanelLength, "2=1; 1=0")
+```
+
+
+```{r , message=FALSE, warning=FALSE, echo=FALSE}
+## Save DF
+### I will save, so I can use the scaled demos in Study 3.
+save(dat, file = "/Users/hectorbahamonde/RU/research/Running_Tally/dat.RData")
+```
+
+
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 if (!require("pacman")) install.packages("pacman"); library(pacman)
 p_load(scales)
@@ -265,27 +293,8 @@ dat$RWilliamsMR29Cumu2 = rescale(dat$RWilliamsMR29Cumu2, to = c(-.5, .5))
 dat$RWilliamsWk9MRWeeklyTally2 = rescale(dat$RWilliamsWk9MRWeeklyTally2, to = c(-.5, .5))
 dat$RWilliamsMR29PB2 = rescale(dat$RWilliamsMR29PB2, to = c(-.5, .5))
 dat$RWilliamsAccAccessedRecogMemAff = rescale(dat$RWilliamsAccAccessedRecogMemAff, to = c(-.5, .5))
-# recoding PanelLength (which is a control var.)
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-p_load(car)
-dat$PanelLength <- recode(dat$PanelLength, "2=1; 1=0")
 ```
 
-
-
-```{r , message=FALSE, warning=FALSE, echo=FALSE}
-## Define Control Variables for all models.
-controls = c("Female", "Age", "YrsEduc", "Black", "Latino", "PolSoph", "LibCon", "PanelLength")
-
-## centering all control variables
-if (!require("pacman")) install.packages("pacman"); library(pacman)
-p_load(scales)
-
-dat$Age = rescale(dat$Age, to = c(-.5,.5))
-dat$YrsEduc = rescale(dat$YrsEduc, to = c(-.5,.5))
-dat$PolSoph = rescale(dat$PolSoph, to = c(-.5,.5))
-dat$LibCon = rescale(as.numeric(dat$LibCon), to = c(-.5,.5))
-```
 
 ##### Dropping Missing Values
 
@@ -3134,6 +3143,177 @@ mean(table.df.mturk$Mean[12:35])
 
 
 # Study 3: Hypotheses Testing
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+# Loading Saved DF from above (rescaled variables, recoded, etc.)
+load("/Users/hectorbahamonde/RU/research/Running_Tally/dat.RData")
+```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+# Scaling
+
+if (!require("pacman")) install.packages("pacman"); library(pacman)
+p_load(scales)
+
+## H1.A
+dat$DSmithMemAff5 = rescale(dat$DSmithMemAff5, to = c(-.5, .5))
+dat$DSmithWk5WeeklyTally0 = rescale(dat$DSmithWk5WeeklyTally0, to = c(-.5, .5))
+dat$DWilsonMemAff5 = rescale(dat$DWilsonMemAff5, to = c(-.5, .5))
+dat$DWilsonWk5WeeklyTally0 = rescale(dat$DWilsonWk5WeeklyTally0, to = c(-.5, .5))
+dat$RJonesMemAff5 = rescale(dat$RJonesMemAff5, to = c(-.5, .5))
+dat$RJonesWk5WeeklyTally0 = rescale(dat$RJonesWk5WeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsMemAff5 = rescale(dat$RWilliamsMemAff5, to = c(-.5, .5))
+dat$RWilliamsWk5WeeklyTally0 = rescale(dat$RWilliamsWk5WeeklyTally0, to = c(-.5, .5))
+
+## H1.B.1
+dat$DSmithDifAff = rescale(dat$DSmithDifAff, to = c(-.5, .5))
+dat$DSmithWk9WeeklyTally0 = rescale(dat$DSmithWk9WeeklyTally0, to = c(-.5, .5))
+dat$DWilsonDifAff = rescale(dat$DWilsonDifAff, to = c(-.5, .5))
+dat$DWilsonWk9WeeklyTally0 = rescale(dat$DWilsonWk9WeeklyTally0, to = c(-.5, .5))
+dat$RJonesDifAff = rescale(dat$RJonesDifAff, to = c(-.5, .5))
+dat$RJonesWk9WeeklyTally0 = rescale(dat$RJonesWk9WeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsDifAff = rescale(dat$RWilliamsDifAff, to = c(-.5, .5))
+dat$RWilliamsWk9WeeklyTally0 = rescale(dat$RWilliamsWk9WeeklyTally0, to = c(-.5, .5))
+
+## H1.B.2
+dat$DSmithDifAff = rescale(dat$DSmithDifAff, to = c(-.5, .5))
+dat$DSmithWk9MRWeeklyTally0 = rescale(dat$DSmithWk9MRWeeklyTally0, to = c(-.5, .5))
+dat$DWilsonDifAff = rescale(dat$DWilsonDifAff, to = c(-.5, .5))
+dat$DWilsonWk9MRWeeklyTally0 = rescale(dat$DWilsonWk9MRWeeklyTally0, to = c(-.5, .5))
+dat$RJonesDifAff = rescale(dat$RJonesDifAff, to = c(-.5, .5))
+dat$RJonesWk9MRWeeklyTally0 = rescale(dat$RJonesWk9MRWeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsDifAff = rescale(dat$RWilliamsDifAff, to = c(-.5, .5))
+dat$RWilliamsWk9MRWeeklyTally0 = rescale(dat$RWilliamsWk9MRWeeklyTally0, to = c(-.5, .5))
+
+## H1.B.3
+dat$DSmithAccRecogMemAff10 = rescale(dat$DSmithAccRecogMemAff10, to = c(-.5, .5))
+dat$DSmithWk9WeeklyTally0 = rescale(dat$DSmithWk9WeeklyTally0, to = c(-.5, .5))
+dat$DWilsonAccRecogMemAff10 = rescale(dat$DWilsonAccRecogMemAff10, to = c(-.5, .5))
+dat$DWilsonWk9WeeklyTally0 = rescale(dat$DWilsonWk9WeeklyTally0, to = c(-.5, .5))
+dat$RJonesAccRecogMemAff10 = rescale(dat$RJonesAccRecogMemAff10, to = c(-.5, .5))
+dat$RJonesWk9WeeklyTally0 = rescale(dat$RJonesWk9WeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsAccRecogMemAff10 = rescale(dat$RWilliamsAccRecogMemAff10, to = c(-.5, .5))
+dat$RWilliamsWk9WeeklyTally0 = rescale(dat$RWilliamsWk9WeeklyTally0, to = c(-.5, .5))
+
+## H1.B.4
+dat$DSmithAccRecogMemAff10 = rescale(dat$DSmithAccRecogMemAff10, to = c(-.5, .5))
+dat$DSmithWk9MRWeeklyTally0 = rescale(dat$DSmithWk9MRWeeklyTally0, to = c(-.5, .5))
+dat$DWilsonAccRecogMemAff10 = rescale(dat$DWilsonAccRecogMemAff10, to = c(-.5, .5))
+dat$DWilsonWk9MRWeeklyTally0 = rescale(dat$DWilsonWk9MRWeeklyTally0, to = c(-.5, .5))
+dat$RJonesAccRecogMemAff10 = rescale(dat$RJonesAccRecogMemAff10, to = c(-.5, .5))
+dat$RJonesWk9MRWeeklyTally0 = rescale(dat$RJonesWk9MRWeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsAccRecogMemAff10 = rescale(dat$RWilliamsAccRecogMemAff10, to = c(-.5, .5))
+dat$RWilliamsWk9MRWeeklyTally0 = rescale(dat$RWilliamsWk9MRWeeklyTally0, to = c(-.5, .5))
+
+## H2.A.1
+dat$DSmithMemAff5 = rescale(dat$DSmithMemAff5, to = c(-.5, .5))
+dat$DSmithWk4WeeklyTally0 = rescale(dat$DSmithWk4WeeklyTally0, to = c(-.5, .5))
+dat$DSmithJustWk5RT0 = rescale(dat$DSmithJustWk5RT0, to = c(-.5, .5))
+dat$DWilsonMemAff5 = rescale(dat$DWilsonMemAff5, to = c(-.5, .5))
+dat$DWilsonWk4WeeklyTally0 = rescale(dat$DWilsonWk4WeeklyTally0, to = c(-.5, .5))
+dat$DWilsonJustWk5RT0 = rescale(dat$DWilsonJustWk5RT0, to = c(-.5, .5))
+dat$RJonesMemAff5 = rescale(dat$RJonesMemAff5, to = c(-.5, .5))
+dat$RJonesWk4WeeklyTally0 = rescale(dat$RJonesWk4WeeklyTally0, to = c(-.5, .5))
+dat$RJonesJustWk5RT0 = rescale(dat$RJonesJustWk5RT0, to = c(-.5, .5))
+dat$RWilliamsMemAff5 = rescale(dat$RWilliamsMemAff5, to = c(-.5, .5))
+dat$RWilliamsWk4WeeklyTally0 = rescale(dat$RWilliamsWk4WeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsJustWk5RT0 = rescale(dat$RWilliamsJustWk5RT0, to = c(-.5, .5))
+
+## H2.A.2
+dat$DSmithDifAff = rescale(dat$DSmithDifAff, to = c(-.5, .5))
+dat$DSmithWk8WeeklyTally0 = rescale(dat$DSmithWk8WeeklyTally0, to = c(-.5, .5))
+dat$DSmithJustWk9RT0 = rescale(dat$DSmithJustWk9RT0, to = c(-.5, .5))
+dat$DWilsonDifAff = rescale(dat$DWilsonDifAff, to = c(-.5, .5))
+dat$DWilsonWk8WeeklyTally0 = rescale(dat$DWilsonWk8WeeklyTally0, to = c(-.5, .5))
+dat$DWilsonJustWk9RT0 = rescale(dat$DWilsonJustWk9RT0, to = c(-.5, .5))
+dat$RJonesDifAff = rescale(dat$RJonesDifAff, to = c(-.5, .5))
+dat$RJonesWk8WeeklyTally0 = rescale(dat$RJonesWk8WeeklyTally0, to = c(-.5, .5))
+dat$RJonesJustWk9RT0 = rescale(dat$RJonesJustWk9RT0, to = c(-.5, .5))
+dat$RWilliamsDifAff = rescale(dat$RWilliamsDifAff, to = c(-.5, .5))
+dat$RWilliamsWk8WeeklyTally0 = rescale(dat$RWilliamsWk8WeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsJustWk9RT0 = rescale(dat$RWilliamsJustWk9RT0, to = c(-.5, .5))
+
+## H2.A.3
+dat$DSmithAccRecogMemAff10 = rescale(dat$DSmithAccRecogMemAff10, to = c(-.5, .5))
+dat$DSmithWk8WeeklyTally0 = rescale(dat$DSmithWk8WeeklyTally0, to = c(-.5, .5))
+dat$DSmithJustWk9RT0 = rescale(dat$DSmithJustWk9RT0, to = c(-.5, .5))
+dat$DWilsonAccRecogMemAff10 = rescale(dat$DWilsonAccRecogMemAff10, to = c(-.5, .5))
+dat$DWilsonWk8WeeklyTally0 = rescale(dat$DWilsonWk8WeeklyTally0, to = c(-.5, .5))
+dat$DWilsonJustWk9RT0 = rescale(dat$DWilsonJustWk9RT0, to = c(-.5, .5))
+dat$RJonesAccRecogMemAff10 = rescale(dat$RJonesAccRecogMemAff10, to = c(-.5, .5))
+dat$RJonesWk8WeeklyTally0 = rescale(dat$RJonesWk8WeeklyTally0, to = c(-.5, .5))
+dat$RJonesJustWk9RT0 = rescale(dat$RJonesJustWk9RT0, to = c(-.5, .5))
+dat$RWilliamsAccRecogMemAff10 = rescale(dat$RWilliamsAccRecogMemAff10, to = c(-.5, .5))
+dat$RWilliamsWk8WeeklyTally0 = rescale(dat$RWilliamsWk8WeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsJustWk9RT0 = rescale(dat$RWilliamsJustWk9RT0, to = c(-.5, .5))
+
+## H2.A.4
+dat$DSmithDifAff = rescale(dat$DSmithDifAff, to = c(-.5, .5))
+dat$DSmithWk8MRWeeklyTally0 = rescale(dat$DSmithWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$DSmithJustWk9MRRT0 = rescale(dat$DSmithJustWk9MRRT0, to = c(-.5, .5))
+dat$DWilsonDifAff = rescale(dat$DWilsonDifAff, to = c(-.5, .5))
+dat$DWilsonWk8MRWeeklyTally0 = rescale(dat$DWilsonWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$DWilsonJustWk9MRRT0 = rescale(dat$DWilsonJustWk9MRRT0, to = c(-.5, .5))
+dat$RJonesDifAff = rescale(dat$RJonesDifAff, to = c(-.5, .5))
+dat$RJonesWk8MRWeeklyTally0 = rescale(dat$RJonesWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$RJonesJustWk9MRRT0 = rescale(dat$RJonesJustWk9MRRT0, to = c(-.5, .5))
+dat$RWilliamsDifAff = rescale(dat$RWilliamsDifAff, to = c(-.5, .5))
+dat$RWilliamsWk8MRWeeklyTally0 = rescale(dat$RWilliamsWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsJustWk9MRRT0 = rescale(dat$RWilliamsJustWk9MRRT0, to = c(-.5, .5))
+
+## H2.A.5
+dat$DSmithAccRecogMemAff10 = rescale(dat$DSmithAccRecogMemAff10, to = c(-.5, .5))
+dat$DSmithWk8MRWeeklyTally0 = rescale(dat$DSmithWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$DSmithJustWk9MRRT0 = rescale(dat$DSmithJustWk9MRRT0, to = c(-.5, .5))
+dat$DWilsonAccRecogMemAff10 = rescale(dat$DWilsonAccRecogMemAff10, to = c(-.5, .5))
+dat$DWilsonWk8MRWeeklyTally0 = rescale(dat$DWilsonWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$DWilsonJustWk9MRRT0 = rescale(dat$DWilsonJustWk9MRRT0, to = c(-.5, .5))
+dat$RJonesAccRecogMemAff10 = rescale(dat$RJonesAccRecogMemAff10, to = c(-.5, .5))
+dat$RJonesWk8MRWeeklyTally0 = rescale(dat$RJonesWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$RJonesJustWk9MRRT0 = rescale(dat$RJonesJustWk9MRRT0, to = c(-.5, .5))
+dat$RWilliamsAccRecogMemAff10 = rescale(dat$RWilliamsAccRecogMemAff10, to = c(-.5, .5))
+dat$RWilliamsWk8MRWeeklyTally0 = rescale(dat$RWilliamsWk8MRWeeklyTally0, to = c(-.5, .5))
+dat$RWilliamsJustWk9MRRT0 = rescale(dat$RWilliamsJustWk9MRRT0, to = c(-.5, .5))
+```
+
+## Scaling Issue
+
+- The variables had been rescaled. Now I show summary stats for all of them.
+```{r , message=T, warning=FALSE, echo=T}
+# Var 1
+summary(dat$DSmithWk4WeeklyTally0)
+summary(dat$DWilsonWk4WeeklyTally0)
+summary(dat$RJonesWk4WeeklyTally0)
+summary(dat$RWilliamsWk4WeeklyTally0)
+# Var 2
+summary(dat$DSmithJustWk5RT0)
+summary(dat$DWilsonJustWk5RT0)
+summary(dat$RJonesJustWk5RT0)
+summary(dat$RWilliamsJustWk5RT0)
+# Var 3
+summary(dat$DSmithWk8WeeklyTally0)
+summary(dat$DWilsonWk8WeeklyTally0)
+summary(dat$RJonesWk8WeeklyTally0)
+summary(dat$RWilliamsWk8WeeklyTally0)
+# Var 4
+summary(dat$DSmithJustWk9RT0)
+summary(dat$DWilsonJustWk9RT0)
+summary(dat$RJonesJustWk9RT0)
+summary(dat$RWilliamsJustWk9RT0)
+# Var 5
+summary(dat$DSmithWk8MRWeeklyTally0)
+summary(dat$DWilsonWk8MRWeeklyTally0)
+summary(dat$RJonesWk8MRWeeklyTally0)
+summary(dat$RWilliamsWk8MRWeeklyTally0)
+# Var 6
+summary(dat$DSmithJustWk9MRRT0)
+summary(dat$DWilsonJustWk9MRRT0)
+summary(dat$RJonesJustWk9MRRT0)
+summary(dat$RWilliamsJustWk9MRRT0)
+```
+
+
+
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 # Declare competing variables to be passed to the models.
