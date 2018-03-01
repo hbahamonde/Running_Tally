@@ -3146,7 +3146,12 @@ mean(table.df.mturk$Mean[12:35])
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 # Loading Saved DF from above (rescaled variables, recoded, etc.)
+# cat("\014")
+# rm(list=ls())
 load("/Users/hectorbahamonde/RU/research/Running_Tally/dat.RData")
+
+controls = c("Female", "Age", "YrsEduc", "Black", "Latino", "PolSoph", "LibCon", "PanelLength")
+
 ```
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
@@ -3388,10 +3393,10 @@ tally.affective.variables.Williams.H2.A.5 = c("RWilliamsAccRecogMemAff10", "RWil
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 A: Student Sample [W5]
-s3.H1.A.Smith.Student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H1.A.Wilson.Student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H1.A.Jones.Student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H1.A.Williams.Student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H1.A.Smith.Student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.A.Wilson.Student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.A.Jones.Student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.A.Williams.Student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H1.A.Smith.Student = colnames(s3.H1.A.Smith.Student$model)[1] 
@@ -3404,10 +3409,10 @@ dv.s3.H1.A.Williams.Student = colnames(s3.H1.A.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 A: MTurk Sample [W5]
-s3.H1.A.Smith.MTurk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H1.A.Wilson.MTurk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H1.A.Jones.MTurk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H1.A.Williams.MTurk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H1.A.Smith.MTurk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.A.Wilson.MTurk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.A.Jones.MTurk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.A.Williams.MTurk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.A)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H1.A.Smith.MTurk = colnames(s3.H1.A.Smith.MTurk$model)[1] 
@@ -3421,10 +3426,10 @@ dv.s3.H1.A.Williams.MTurk = colnames(s3.H1.A.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.1: Student Sample [W10]
-s3.H1.B.1.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H1.B.1.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H1.B.1.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H1.B.1.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H1.B.1.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.1.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.1.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.1.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H1.B.1.Smith.Student = colnames(s3.H1.B.1.Smith.Student$model)[1]  
@@ -3437,10 +3442,10 @@ dv.s3.H1.B.1.Williams.Student = colnames(s3.H1.B.1.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.1: MTurk Sample [W10]
-s3.H1.B.1.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H1.B.1.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H1.B.1.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H1.B.1.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H1.B.1.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.1.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.1.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.1.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H1.B.1.Smith.MTurk = colnames(s3.H1.B.1.Smith.MTurk$model)[1]
@@ -3452,10 +3457,10 @@ dv.s3.H1.B.1.Williams.MTurk = colnames(s3.H1.B.1.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.2: Student Sample [W10]
-s3.H1.B.2.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H1.B.2.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H1.B.2.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H1.B.2.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H1.B.2.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.2.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.2.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.2.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H1.B.2.Smith.Student = colnames(s3.H1.B.2.Smith.Student$model)[1]
@@ -3468,10 +3473,10 @@ dv.s3.H1.B.2.Williams.Student = colnames(s3.H1.B.2.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.2: MTurk Sample [W10]
-s3.H1.B.2.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H1.B.2.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H1.B.2.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H1.B.2.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H1.B.2.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.2.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.2.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.2.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H1.B.2.Smith.MTurk = colnames(s3.H1.B.2.Smith.MTurk$model)[1]
@@ -3484,10 +3489,10 @@ dv.s3.H1.B.2.Williams.MTurk = colnames(s3.H1.B.2.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.3: Student Sample [W10]
-s3.H1.B.3.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H1.B.3.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H1.B.3.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H1.B.3.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H1.B.3.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.3.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.3.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.3.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H1.B.3.Smith.Student = colnames(s3.H1.B.3.Smith.Student$model)[1]
@@ -3499,10 +3504,10 @@ dv.s3.H1.B.3.Williams.Student = colnames(s3.H1.B.3.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.3: MTurk Sample [W10]
-s3.H1.B.3.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H1.B.3.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H1.B.3.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H1.B.3.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H1.B.3.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.3.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.3.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.3.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H1.B.3.Smith.MTurk = colnames(s3.H1.B.3.Smith.MTurk$model)[1]
@@ -3514,10 +3519,10 @@ dv.s3.H1.B.3.Williams.MTurk = colnames(s3.H1.B.3.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.4: Student Sample [W10]
-s3.H1.B.4.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H1.B.4.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H1.B.4.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H1.B.4.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H1.B.4.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.4.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.4.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H1.B.4.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H1.B.4.Smith.Student = colnames(s3.H1.B.4.Smith.Student$model)[1]
@@ -3529,10 +3534,10 @@ dv.s3.H1.B.4.Williams.Student = colnames(s3.H1.B.4.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H1 B.4: MTurk Sample [W10]
-s3.H1.B.4.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H1.B.4.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H1.B.4.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H1.B.4.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H1.B.4.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.4.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.4.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H1.B.4.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H1.B.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H1.B.4.Smith.MTurk = colnames(s3.H1.B.4.Smith.MTurk$model)[1]
@@ -3544,10 +3549,10 @@ dv.s3.H1.B.4.Williams.MTurk = colnames(s3.H1.B.4.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.1: Student Sample [W5]
-s3.H2.A.1.Smith.Student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H2.A.1.Wilson.Student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H2.A.1.Jones.Student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H2.A.1.Williams.Student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H2.A.1.Smith.Student = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.1.Wilson.Student = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.1.Jones.Student = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.1.Williams.Student = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H2.A.1.Smith.Student = colnames(s3.H2.A.1.Smith.Student$model)[1]
@@ -3559,10 +3564,10 @@ dv.s3.H2.A.1.Williams.Student = colnames(s3.H2.A.1.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.1: MTurk Sample [W5]
-s3.H2.A.1.Smith.MTurk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H2.A.1.Wilson.MTurk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H2.A.1.Jones.MTurk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H2.A.1.Williams.MTurk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H2.A.1.Smith.MTurk = lm(as.formula(paste("Wk5DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.1.Wilson.MTurk = lm(as.formula(paste("Wk5DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.1.Jones.MTurk = lm(as.formula(paste("Wk5RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.1.Williams.MTurk = lm(as.formula(paste("Wk5RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.1)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H2.A.1.Smith.MTurk = colnames(s3.H2.A.1.Smith.MTurk$model)[1]
@@ -3574,10 +3579,10 @@ dv.s3.H2.A.1.Williams.MTurk = colnames(s3.H2.A.1.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.2: Student Sample [W10]
-s3.H2.A.2.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H2.A.2.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H2.A.2.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H2.A.2.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H2.A.2.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.2.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.2.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.2.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H2.A.2.Smith.Student = colnames(s3.H2.A.2.Smith.Student$model)[1]
@@ -3588,10 +3593,10 @@ dv.s3.H2.A.2.Williams.Student = colnames(s3.H2.A.2.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.2: MTurk Sample [W10]
-s3.H2.A.2.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H2.A.2.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H2.A.2.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H2.A.2.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H2.A.2.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.2.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.2.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.2.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.2)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H2.A.2.Smith.MTurk = colnames(s3.H2.A.2.Smith.MTurk$model)[1]
@@ -3603,10 +3608,10 @@ dv.s3.H2.A.2.Williams.MTurk = colnames(s3.H2.A.2.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.3: Student Sample [W10]
-s3.H2.A.3.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H2.A.3.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H2.A.3.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H2.A.3.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H2.A.3.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.3.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.3.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.3.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H2.A.3.Smith.Student = colnames(s3.H2.A.3.Smith.Student$model)[1]
@@ -3618,10 +3623,10 @@ dv.s3.H2.A.3.Williams.Student = colnames(s3.H2.A.3.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.3: MTurk Sample [W10]
-s3.H2.A.3.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H2.A.3.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H2.A.3.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H2.A.3.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H2.A.3.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.3.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.3.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.3.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.3)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H2.A.3.Smith.MTurk = colnames(s3.H2.A.3.Smith.MTurk$model)[1]
@@ -3633,10 +3638,10 @@ dv.s3.H2.A.3.Williams.MTurk = colnames(s3.H2.A.3.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.4: Student Sample [W10]
-s3.H2.A.4.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H2.A.4.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H2.A.4.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H2.A.4.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H2.A.4.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.4.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.4.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.4.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H2.A.4.Smith.Student = colnames(s3.H2.A.4.Smith.Student$model)[1]
@@ -3647,10 +3652,10 @@ dv.s3.H2.A.4.Williams.Student = colnames(s3.H2.A.4.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.4: MTurk Sample [W10]
-s3.H2.A.4.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H2.A.4.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H2.A.4.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H2.A.4.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H2.A.4.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.4.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.4.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.4.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.4)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H2.A.4.Smith.MTurk = colnames(s3.H2.A.4.Smith.MTurk$model)[1]
@@ -3662,10 +3667,10 @@ dv.s3.H2.A.4.Williams.MTurk = colnames(s3.H2.A.4.Williams.MTurk$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.5: Student Sample [W10]
-s3.H2.A.5.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="Student"))
-s3.H2.A.5.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="Student"))
-s3.H2.A.5.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="Student"))
-s3.H2.A.5.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="Student"))
+s3.H2.A.5.Smith.Student = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.5.Wilson.Student = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.5.Jones.Student = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
+s3.H2.A.5.Williams.Student = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="Student"))
 
 # name of the DV
 dv.s3.H2.A.5.Smith.Student = colnames(s3.H2.A.5.Smith.Student$model)[1]
@@ -3676,10 +3681,10 @@ dv.s3.H2.A.5.Williams.Student = colnames(s3.H2.A.5.Williams.Student$model)[1]
 
 ```{r , message=FALSE, warning=FALSE, echo=FALSE}
 ## H2 A.5: MTurk Sample [W10]
-s3.H2.A.5.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DSmith, dat.DSmith$StudentParent=="MTurk"))
-s3.H2.A.5.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.DWilson, dat.DWilson$StudentParent=="MTurk"))
-s3.H2.A.5.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RJones, dat.RJones$StudentParent=="MTurk"))
-s3.H2.A.5.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat.RWilliams, dat.RWilliams$StudentParent=="MTurk"))
+s3.H2.A.5.Smith.MTurk = lm(as.formula(paste("Wk10DemSmithFTR", paste(paste(c(controls,tally.affective.variables.Smith.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.5.Wilson.MTurk = lm(as.formula(paste("Wk10DemWilsonFTR", paste(paste(c(controls,tally.affective.variables.Wilson.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.5.Jones.MTurk = lm(as.formula(paste("Wk10RepJonesFTR", paste(paste(c(controls,tally.affective.variables.Jones.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
+s3.H2.A.5.Williams.MTurk = lm(as.formula(paste("Wk10RepWilliamsFTR", paste(paste(c(controls,tally.affective.variables.Williams.H2.A.5)), collapse=" + "), sep=" ~ ")), data=subset(dat, dat$StudentParent=="MTurk"))
 
 # name of the DV
 dv.s3.H2.A.5.Smith.MTurk = colnames(s3.H2.A.5.Smith.MTurk$model)[1]
@@ -3687,6 +3692,7 @@ dv.s3.H2.A.5.Wilson.MTurk = colnames(s3.H2.A.5.Wilson.MTurk$model)[1]
 dv.s3.H2.A.5.Jones.MTurk = colnames(s3.H2.A.5.Jones.MTurk$model)[1]
 dv.s3.H2.A.5.Williams.MTurk = colnames(s3.H2.A.5.Williams.MTurk$model)[1]
 ```
+
 
 ## Smith [Student]
 
